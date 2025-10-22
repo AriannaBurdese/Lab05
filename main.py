@@ -1,3 +1,4 @@
+
 import flet as ft
 from alert import AlertManager
 from autonoleggio import Autonoleggio
@@ -35,11 +36,28 @@ def main(page: ft.Page):
     # ListView per mostrare la lista di auto aggiornata
     lista_auto = ft.ListView(expand=True, spacing=5, padding=10, auto_scroll=True)
 
-    # Tutti i TextField per le info necessarie per aggiungere una nuova automobile (marca, modello, anno, contatore posti)
-    # TODO
+    # Tutti i TextField per le info necessarie per aggiungere una nuova automobile (marca, modello, anno)
+    textIn_marca= ft.TextField(label = "Aggiungi marca")
+    textIn_modello = ft.TextField(label = "Aggiungi modello")
+    textIn_anno = ft.TextField(label = "Aggiungi anno")
+    textIn_posti = ft.TextField(label = "Modifica posti", width=120, disabled= True,
+                                value = "0", border_color = "green", text_align = ft.TextAlign.CENTER)
+
+
+
+
+    def btnAdd(e):  #CHIEDI SE SERVE
+        nuova_auto = autonoleggio.aggiungi_automobile(str(textIn_marca.value), str(textIn_modello.value), int(textIn_anno.value), int(textIn_posti.value))
+
+        try:
+            textIn_anno.value = int(textIn_anno.value)
+        except ValueError:
+            alert.show_alert("Errore! Inserisci valori validi per anno")
+
+
 
     # --- FUNZIONI APP ---
-    def aggiorna_lista_auto():
+    def aggiorna_lista_auto(e= None):
         lista_auto.controls.clear()
         for auto in autonoleggio.automobili_ordinate_per_marca():
             stato = "✅" if auto.disponibile else "⛔"
@@ -58,14 +76,30 @@ def main(page: ft.Page):
         page.update()
 
     # Handlers per la gestione dei bottoni utili all'inserimento di una nuova auto
-    # TODO
+    def handleAdd(e):
+        currentVal = textIn_posti.value
+        textIn_posti.value = int(currentVal) +1
+        textIn_posti.update()
+
+    def handleRemove(e):
+        currentVal = textIn_posti.value
+        if currentVal > 0:
+            textIn_posti.value = int(currentVal) -1
+            textIn_posti.update()
+        else:
+            alert.show_alert("ERRORE! Il numero di posti non può essere negativo")
+
 
     # --- EVENTI ---
     toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=cambia_tema)
     pulsante_conferma_responsabile = ft.ElevatedButton("Conferma", on_click=conferma_responsabile)
+    pulsante_aggiungi_automobile = ft.ElevatedButton("Aggiungi automobile", on_click= aggiorna_lista_auto)
 
     # Bottoni per la gestione dell'inserimento di una nuova auto
-    # TODO
+    btnMinus = ft.IconButton(icon = ft.Icons.REMOVE, icon_color = "pink", icon_size=24, on_click=handleRemove)
+    btnAdd = ft.IconButton(icon = ft.Icons.ADD, icon_color = "green", icon_size=24, on_click=handleAdd)
+
+
 
     # --- LAYOUT ---
     page.add(
@@ -83,7 +117,15 @@ def main(page: ft.Page):
                alignment=ft.MainAxisAlignment.CENTER),
 
         # Sezione 3
-        # TODO
+        ft.Text("Aggiungi nuova automobile", size=20),
+        ft.Row(spacing=20,
+               controls = [textIn_marca, textIn_modello, textIn_anno, btnMinus, textIn_posti, btnAdd],
+               alignment=ft.MainAxisAlignment.CENTER),
+        ft.Row(spacing=20,
+               controls = [pulsante_aggiungi_automobile],
+               alignment=ft.MainAxisAlignment.CENTER),
+
+
 
         # Sezione 4
         ft.Divider(),
