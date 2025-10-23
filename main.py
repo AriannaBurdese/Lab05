@@ -45,16 +45,21 @@ def main(page: ft.Page):
 
 
 
+    def aggiungi_auto(e):
 
-    def btnAdd(e):  #CHIEDI SE SERVE
-        nuova_auto = autonoleggio.aggiungi_automobile(str(textIn_marca.value), str(textIn_modello.value), int(textIn_anno.value), int(textIn_posti.value))
+
 
         try:
-            textIn_anno.value = int(textIn_anno.value)
+            anno= int(textIn_anno.value)
+            posti = int(textIn_posti.value)
+            autonoleggio.aggiungi_automobile(str(textIn_marca.value), str(textIn_modello.value), anno, posti)
+            textIn_marca.value = ""
+            textIn_modello.value = ""
+            textIn_anno.value = ""
+            textIn_posti.value = "0"
+            aggiorna_lista_auto()
         except ValueError:
-            alert.show_alert("Errore! Inserisci valori validi per anno")
-
-
+            alert.show_alert("Errore! Inserisci valori validi per anno e posti")
 
     # --- FUNZIONI APP ---
     def aggiorna_lista_auto(e= None):
@@ -75,15 +80,16 @@ def main(page: ft.Page):
         txt_responsabile.value = f"Responsabile: {autonoleggio.responsabile}"
         page.update()
 
+
     # Handlers per la gestione dei bottoni utili all'inserimento di una nuova auto
     def handleAdd(e):
-        currentVal = textIn_posti.value
+        currentVal = int(textIn_posti.value)
         textIn_posti.value = int(currentVal) +1
         textIn_posti.update()
 
     def handleRemove(e):
         currentVal = textIn_posti.value
-        if currentVal > 0:
+        if int(currentVal) > 0:
             textIn_posti.value = int(currentVal) -1
             textIn_posti.update()
         else:
@@ -93,7 +99,7 @@ def main(page: ft.Page):
     # --- EVENTI ---
     toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=cambia_tema)
     pulsante_conferma_responsabile = ft.ElevatedButton("Conferma", on_click=conferma_responsabile)
-    pulsante_aggiungi_automobile = ft.ElevatedButton("Aggiungi automobile", on_click= aggiorna_lista_auto)
+    pulsante_aggiungi_automobile = ft.ElevatedButton("Aggiungi automobile", on_click= aggiungi_auto)
 
     # Bottoni per la gestione dell'inserimento di una nuova auto
     btnMinus = ft.IconButton(icon = ft.Icons.REMOVE, icon_color = "pink", icon_size=24, on_click=handleRemove)
@@ -124,7 +130,6 @@ def main(page: ft.Page):
         ft.Row(spacing=20,
                controls = [pulsante_aggiungi_automobile],
                alignment=ft.MainAxisAlignment.CENTER),
-
 
 
         # Sezione 4
